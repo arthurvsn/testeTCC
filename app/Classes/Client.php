@@ -1,5 +1,7 @@
 <?php
 namespace App\Classes;
+//require __DIR__.'/../../../../vendor/autoload.php';
+
 
 class Client 
     {
@@ -17,6 +19,7 @@ class Client
 
         public function __construct()
         {
+            echo "aqui"; die();
             $this->client = new Solarium\Client($this->config);
         }
 

@@ -1,33 +1,40 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use Response;
-use Client;
+use \App\Response\Response;
 
 class SolariumController extends Controller
 {
-    private $response;
-    private $client;
+    protected $client;
 
-    public function __construct() 
+    public function __construct(\Solarium\Client $client)
     {
-        $this->client = new Client();
-        $this->response = new Response();
+        $this->client = $client;
     }
 
-    public function search($stringSearch) 
+    public function ping()
     {
+        // create a ping query
+        $ping = $this->client->createPing();
 
-        $resultQuery = $this->client->search($stringSearch);
-        
-        $this->response->setType("S");
-        $this->response->setMessages("Search sucessufuly");
-        $this->response->setDataSet("Result", $resultQuery);
+        // execute the ping query
+        try {
+            $this->client->ping($ping);
+            return response()->json('OK');
+        } catch (\Solarium\Exception $e) {
+            return response()->json('ERROR', 500);
+        }
+    }
 
-        return response()->json($this->response->toString(), 200);
+    public function search($stringSearch)
+    {
+        $query = $this->client->createSelect();
+        $query->createFilterQuery('abreviacao')->setQuery($stringSearch);
+        $resulset = $this->client->select($query);
+
+        // display the total number of documents found by solr
+        echo "<pre>";
+        var_dump($resulset); die();
 
     }
-    
 }
