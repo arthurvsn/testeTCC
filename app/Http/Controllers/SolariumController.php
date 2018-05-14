@@ -50,7 +50,29 @@ class SolariumController extends Controller
      */
     public function search($stringSearch)
     {
-        
+        /*
+        // create a client instance
+        $client = new Solarium\Client($config);
+
+        // get a select query instance
+        $query = $client->createSelect();
+
+        // get the facetset component
+        $facetSet = $query->getFacetSet();
+
+        // create a facet field instance and set options
+        $facetSet->createFacetField('type')->setField('type');
+
+        // this executes the query and returns the result
+        $resultset = $client->select($query);
+
+        // display facet counts
+        echo '<hr/>Facet counts for field "type":<br/>';
+        $facet = $resultset->getFacetSet()->getFacet('stock');
+        foreach($facet as $value => $count) {
+            echo "{$value} [{$count}]<br/>"; // ex output: type name [100]
+        }
+        */
         $query = $this->client->createSelect();
         $query->createFilterQuery('abreviacao')->setQuery($stringSearch);
         $resultset = $this->client->select($query);
@@ -123,7 +145,6 @@ class SolariumController extends Controller
             $this->response->setMessages("Document not created!");
 
             return response()->json($this->response->toString(), 500);
-        }
-        
+        }        
     }
 }
