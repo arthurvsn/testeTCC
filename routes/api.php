@@ -19,4 +19,5 @@ Route::get('/', function() {
 
 Route::get('/ping', 'SolariumController@ping');
 Route::get('/search/{stringSearch}', 'SolariumController@search');
+Route::post('/addDocument', 'SolariumController@addDocument');
 //Route::get('/search/{stringSearch}', 'SolariumController@search');
