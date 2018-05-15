@@ -38,7 +38,7 @@ class SolariumController extends Controller
         catch (\Solarium\Exception $e) 
         {
             $this->response->setType('S');
-            $this->setMessage('Error!');
+            $this->setMessage($e->getMessage());
             return response()->json($this->response->toString(), 500);
         }
     }
@@ -51,32 +51,32 @@ class SolariumController extends Controller
     public function search($stringSearch)
     {
         /*
-        // create a client instance
-        $client = new Solarium\Client($config);
-
         // get a select query instance
-        $query = $client->createSelect();
+        $query = $this->client->createSelect();
 
         // get the facetset component
         $facetSet = $query->getFacetSet();
 
         // create a facet field instance and set options
-        $facetSet->createFacetField('type')->setField('type');
+        $facetSet->createFacetField($stringSearch)->setField("abreviacao");
 
         // this executes the query and returns the result
-        $resultset = $client->select($query);
+        $resultset = $this->client->select($query);
 
         // display facet counts
         echo '<hr/>Facet counts for field "type":<br/>';
         $facet = $resultset->getFacetSet()->getFacet('stock');
+        print_r($resultset); die();
         foreach($facet as $value => $count) {
             echo "{$value} [{$count}]<br/>"; // ex output: type name [100]
         }
+        
+        die();
         */
         try
         {
             $query = $this->client->createSelect();
-            $query->createFilterQuery('abreviacao')->setQuery($stringSearch);
+            $query->createFilterQuery('field')->setQuery($stringSearch);
             $resultset = $this->client->select($query);
 
             if($resultset->getNumFound() > 0)
@@ -112,7 +112,7 @@ class SolariumController extends Controller
             
             return response()->json($this->response->toString());
         }
-        catch (Exception $e)
+        catch (\Solarium\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessaage());
