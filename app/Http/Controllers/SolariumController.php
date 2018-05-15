@@ -73,34 +73,52 @@ class SolariumController extends Controller
             echo "{$value} [{$count}]<br/>"; // ex output: type name [100]
         }
         */
-        $query = $this->client->createSelect();
-        $query->createFilterQuery('abreviacao')->setQuery($stringSearch);
-        $resultset = $this->client->select($query);
-
-        if($resultset->getNumFound() > 0)
+        try
         {
-            $this->response->setType("S");
-            $this->response->setMessages("The elements were found!");
+            $query = $this->client->createSelect();
+            $query->createFilterQuery('abreviacao')->setQuery($stringSearch);
+            $resultset = $this->client->select($query);
 
-            foreach ($resultset as $document) 
+            if($resultset->getNumFound() > 0)
             {
-                $fields[] = [
-                    'id' => $document->id,
-                    'nome'=> $document->nome,
-                    'abreviacao'=> $document->abreviacao,
-                    'pais'=> $document->pais,
-                ];
+                $this->response->setType("S");
+                $this->response->setMessages("The elements were found!");
+
+                foreach ($resultset as $document) 
+                {
+                    $object = new \stdClass();
+
+                    foreach ($document as $field => $value) 
+                    {
+                        
+                        if (is_array($value)) 
+                        {
+                            $value = implode(', ', $value);
+                        }
+
+                        $object->{$field} = $value;
+                    }
+                
+                    $fields[] = $object;
+                }
+                
+                $this->response->setDataSet("Element", $fields);
+            }
+            else 
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("No occurrences were found!");
             }
             
-            $this->response->setDataSet("Element", $fields);
+            return response()->json($this->response->toString());
         }
-        else 
+        catch (Exception $e)
         {
             $this->response->setType("N");
-            $this->response->setMessages("No occurrences were found!");
+            $this->response->setMessages($e->getMessaage());
+            return response()->json($this->response->toString(), 404);
         }
         
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -113,29 +131,25 @@ class SolariumController extends Controller
         {
             $update = $this->client->createUpdate();
 
-            $objectItensDocument = $request->get('historias');
+            $objectItensDocument = $request->get('time');
+            
+            // create a new document for the data            
+            $doc = $update->createDocument();      
 
-            foreach ($objectItensDocument as $key => $itens) 
+            foreach ($objectItensDocument as $field => $value) 
             {
-                // create a new document for the data
-                $doc = new \stdClass();               
-                
-                foreach ($itens as $field => $value) 
-                {
-                    $doc->{$field} = $value;
-                }
-                
-                $docAdd[] = $doc;
+                $doc->{$field} = $value;   
             }
 
-            $update->addDocuments($docAdd);
+
+            $update->addDocuments(array($doc));
             $update->addCommit();
 
-            $result = $client->update($update);
+            $result = $this->client->update($update);
 
-            $this->response->setType("N");
+            $this->response->setType("S");
             $this->response->setMessages("Documents created!");
-            $this->response->setDataSet('result', $result);
+            $this->response->setDataSet('result', $doc);
 
             return response()->json($this->response->toString(), 200);
         }
