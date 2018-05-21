@@ -35,7 +35,7 @@ class SolariumController extends Controller
 
             return response()->json($this->response->toString());
         } 
-        catch (\Solarium\Exception $e) 
+        catch (\Solarium\Exception $e)
         {
             $this->response->setType('S');
             $this->setMessage('Error!');
@@ -112,7 +112,7 @@ class SolariumController extends Controller
             
             return response()->json($this->response->toString());
         }
-        catch (Exception $e)
+        catch (\Solarium\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessaage());
@@ -153,12 +153,52 @@ class SolariumController extends Controller
 
             return response()->json($this->response->toString(), 200);
         }
-        catch (Execption $e)
+        catch (\Solarium\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages("Document not created!");
 
             return response()->json($this->response->toString(), 500);
-        }        
+        }  
+    }
+
+    /**
+     * Method do update a document and override the same
+     */
+    public function updateDocument(Request $request)
+    {
+        try
+        {
+            $update = $this->client->createUpdate();
+
+            $objectItensDocument = $request->get('time');
+            
+            // create a new document for the data            
+            $doc = $update->createDocument();      
+
+            foreach ($objectItensDocument as $field => $value) 
+            {
+                $doc->{$field} = $value;   
+            }
+
+
+            $update->addDocuments([$doc], true);
+            $update->addCommit();
+
+            $result = $this->client->update($update);
+
+            $this->response->setType("S");
+            $this->response->setMessages("Documents created!");
+            $this->response->setDataSet('result', $doc);
+
+            return response()->json($this->response->toString(), 200);
+        }
+        catch (\Solarium\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Document not created!");
+
+            return response()->json($this->response->toString(), 500);
+        }
     }
 }
