@@ -80,6 +80,7 @@ class SolariumController extends Controller
             $resultset = $this->client->select($query);
 
             /*
+            $statsResult = $resultset->getStats();
             foreach ($statsResult as $field) {
                 echo '<h1>' . $field->getName() . '</h1>';
                 echo 'Min: ' . $field->getMin() . '<br/>';
