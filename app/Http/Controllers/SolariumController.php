@@ -167,6 +167,7 @@ class SolariumController extends Controller
      */
     public function updateDocument(Request $request)
     {
+        //Ainda não tem controle de ID por falta de regra de negocio
         try
         {
             $update = $this->client->createUpdate();
