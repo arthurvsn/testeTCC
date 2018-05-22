@@ -35,7 +35,7 @@ class SolariumController extends Controller
 
             return response()->json($this->response->toString());
         } 
-        catch (\Solarium\Exception $e) 
+        catch (\Solarium\Exception $e)
         {
             $this->response->setType('S');
             $this->setMessage($e->getMessage());
@@ -79,6 +79,38 @@ class SolariumController extends Controller
             $query->createFilterQuery('field')->setQuery($stringSearch);
             $resultset = $this->client->select($query);
 
+            /*
+            $statsResult = $resultset->getStats();
+            foreach ($statsResult as $field) {
+                echo '<h1>' . $field->getName() . '</h1>';
+                echo 'Min: ' . $field->getMin() . '<br/>';
+                echo 'Max: ' . $field->getMax() . '<br/>';
+                echo 'Sum: ' . $field->getSum() . '<br/>';
+                echo 'Count: ' . $field->getCount() . '<br/>';
+                echo 'Missing: ' . $field->getMissing() . '<br/>';
+                echo 'SumOfSquares: ' . $field->getSumOfSquares() . '<br/>';
+                echo 'Mean: ' . $field->getMean() . '<br/>';
+                echo 'Stddev: ' . $field->getStddev() . '<br/>';
+
+                echo '<h2>Field facets</h2>';
+                foreach ($field->getFacets() as $field => $facet) {
+                    echo '<h3>Facet ' . $field . '</h3>';
+                    foreach ($facet as $facetStats) {
+                        echo '<h4>Value: ' . $facetStats->getValue() . '</h4>';
+                        echo 'Min: ' . $facetStats->getMin() . '<br/>';
+                        echo 'Max: ' . $facetStats->getMax() . '<br/>';
+                        echo 'Sum: ' . $facetStats->getSum() . '<br/>';
+                        echo 'Count: ' . $facetStats->getCount() . '<br/>';
+                        echo 'Missing: ' . $facetStats->getMissing() . '<br/>';
+                        echo 'SumOfSquares: ' . $facetStats->getSumOfSquares() . '<br/>';
+                        echo 'Mean: ' . $facetStats->getMean() . '<br/>';
+                        echo 'Stddev: ' . $facetStats->getStddev() . '<br/>';
+                    }
+                }
+
+                echo '<hr/>';
+            }
+            */
             if($resultset->getNumFound() > 0)
             {
                 $this->response->setType("S");
@@ -153,12 +185,53 @@ class SolariumController extends Controller
 
             return response()->json($this->response->toString(), 200);
         }
-        catch (Execption $e)
+        catch (\Solarium\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages("Document not created!");
 
             return response()->json($this->response->toString(), 500);
-        }        
+        }  
+    }
+
+    /**
+     * Method do update a document and override the same
+     */
+    public function updateDocument(Request $request)
+    {
+        //Ainda não tem controle de ID por falta de regra de negocio
+        try
+        {
+            $update = $this->client->createUpdate();
+
+            $objectItensDocument = $request->get('time');
+            
+            // create a new document for the data            
+            $doc = $update->createDocument();      
+
+            foreach ($objectItensDocument as $field => $value) 
+            {
+                $doc->{$field} = $value;   
+            }
+
+
+            $update->addDocuments([$doc], true);
+            $update->addCommit();
+
+            $result = $this->client->update($update);
+
+            $this->response->setType("S");
+            $this->response->setMessages("Documents created!");
+            $this->response->setDataSet('result', $doc);
+
+            return response()->json($this->response->toString(), 200);
+        }
+        catch (\Solarium\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Document not created!");
+
+            return response()->json($this->response->toString(), 500);
+        }
     }
 }

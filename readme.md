@@ -24,6 +24,9 @@
         <pre>php artisan serve</pre>
         As informações de rotas utilizadas estão no diretorio routes/api.php
     </li>
+    <li>
+        # Altere o arquivo solarium.php na pasta de configurações, a posição core para a sua base instanciada no lucene.
+    </li>
 </ul>
 
 ### Desenvolvido por Arthur Vinícius
