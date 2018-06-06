@@ -173,7 +173,7 @@ class SolariumController extends Controller
         $resultset = $this->client->select($query);
         $debugResult = $resultset->getDebug();
 
-        // show the debug results
+        // display the debug results
         echo '<h1>Debug data</h1>';
         echo 'Querystring: ' . $debugResult->getQueryString() . '<br/>';
         echo 'Parsed query: ' . $debugResult->getParsedQuery() . '<br/>';
