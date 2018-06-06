@@ -218,7 +218,7 @@ class SolariumController extends Controller
             foreach ($phaseData as $class => $time) {
                 echo $class . ': ' . $time . '<br/>';
             }
-            echo '<hr/>';
+            echo '<hr/>1';
         }
 
         die();
