@@ -173,7 +173,7 @@ class SolariumController extends Controller
         $resultset = $this->client->select($query);
         $debugResult = $resultset->getDebug();
 
-        // display the debug results
+        // show the debug results
         echo '<h1>Debug data</h1>';
         echo 'Querystring: ' . $debugResult->getQueryString() . '<br/>';
         echo 'Parsed query: ' . $debugResult->getParsedQuery() . '<br/>';
@@ -218,7 +218,7 @@ class SolariumController extends Controller
             foreach ($phaseData as $class => $time) {
                 echo $class . ': ' . $time . '<br/>';
             }
-            echo '<hr/>1';
+            echo '<hr/>';
         }
 
         die();
