@@ -8,12 +8,10 @@ use \App\Response\Response;
 class SolariumController extends Controller
 {
     protected $client;
-    protected $response;
 
     public function __construct(\Solarium\Client $client)
     {
         $this->client = $client;
-        $this->response = new Response();
     }
     
     /**
@@ -26,20 +24,15 @@ class SolariumController extends Controller
         $ping = $this->client->createPing();
 
         // execute the ping query
-        try 
+        try
         {
             $this->client->ping($ping);
 
-            $this->response->setType('S');
-            $this->response->setMessages('Work!');
-
-            return response()->json($this->response->toString());
+            return response()->json(Response::toString(true, "Sucess, Lucene connected"));
         } 
         catch (\Solarium\Exception $e)
         {
-            $this->response->setType('S');
-            $this->response->setMessages($e->getMessage());
-            return response()->json($this->response->toString(), 500);
+            return response()->json(Response::toString(false, $e->getMessage()), 500);
         }
     }
 
@@ -59,9 +52,6 @@ class SolariumController extends Controller
             
             if($resultset->getNumFound() > 0)
             {
-                $this->response->setType("S");
-                $this->response->setMessages("The elements were found!");
-
                 foreach ($resultset as $document) 
                 {
                     $object = new \stdClass();
@@ -79,22 +69,17 @@ class SolariumController extends Controller
                     $fields[] = $object;
                 }
                 
-                $this->response->setDataSet("Element", $fields);
+                return response()->json(Response::toString(true, "The elements were found!", ["Element" => $fields]), 200);
             }
             else 
             {
-                $this->response->setType("N");
-                $this->response->setMessages("No occurrences were found!");
+                return response()->json(Response::toString(false, "No occurrences were found!"), 200);
             }
-            
-            return response()->json($this->response->toString());
             
         }
         catch (\Solarium\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessaage());
-            return response()->json($this->response->toString(), 404);
+            return response()->json(Response::toString(false, $e->getMessage()), 500);
         }
         
         
@@ -197,18 +182,11 @@ class SolariumController extends Controller
 
             $result = $this->client->update($update);
 
-            $this->response->setType("S");
-            $this->response->setMessages("Documents created!");
-            $this->response->setDataSet('result', $doc);
-
-            return response()->json($this->response->toString(), 200);
+            return response()->json(Response::toString(true, "Document created!", ["Result" => $doc]), 200);
         }
         catch (\Solarium\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Document not created!");
-
-            return response()->json($this->response->toString(), 500);
+            return response()->json(Response::toString(false, $e->getMessage()), 500);
         }  
     }
 
@@ -238,18 +216,11 @@ class SolariumController extends Controller
 
             $result = $this->client->update($update);
 
-            $this->response->setType("S");
-            $this->response->setMessages("Documents created!");
-            $this->response->setDataSet('result', $doc);
-
-            return response()->json($this->response->toString(), 200);
+            return response()->json(Response::toString(true, "Document created!", ["Result" => $doc]), 200);
         }
         catch (\Solarium\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Document not created!");
-
-            return response()->json($this->response->toString(), 500);
+            return response()->json(Response::toString(false, $e->getMessage()), 500);
         }
     }
 }
