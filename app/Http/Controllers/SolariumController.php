@@ -101,6 +101,77 @@ class SolariumController extends Controller
     }
 
     /**
+     * Test to debug queries and validates results
+     */
+    public function debugQuery() 
+    {
+        /**
+         * Os testes serão pra validar retornos e etc, todo echo será removido e a medida que 
+         * for sendo utilizados, os metodos irão se transformar em um objeto
+        */
+        $query = $this->client->createSelect();
+        $query->setQuery('ATL');
+
+        // add debug settings
+        $debug = $query->getDebug();
+        $debug->setExplainOther(); //identificador de conjunto de documentos
+
+        // this executes the query and returns the result
+        $resultset = $this->client->select($query);
+        $debugResult = $resultset->getDebug();
+
+        // display the debug results
+        echo '<h1>Debug data</h1>';
+        echo 'Querystring: ' . $debugResult->getQueryString() . '<br/>';
+        echo 'Parsed query: ' . $debugResult->getParsedQuery() . '<br/>';
+        echo 'Query parser: ' . $debugResult->getQueryParser() . '<br/>';
+        echo 'Other query: ' . $debugResult->getOtherQuery() . '<br/>';
+
+        echo '<h2>Explain data</h2>';
+        foreach ($debugResult->getExplain() as $key => $explanation) {
+            echo '<h3>Document key: ' . $key . '</h3>';
+            echo 'Value: ' . $explanation->getValue() . '<br/>';
+            echo 'Match: ' . (($explanation->getMatch() == true) ? 'true' : 'false')  . '<br/>';
+            echo 'Description: ' . $explanation->getDescription() . '<br/>';
+            echo '<h4>Details</h4>';
+            foreach ($explanation as $detail) {
+                echo 'Value: ' . $detail->getValue() . '<br/>';
+                echo 'Match: ' . (($detail->getMatch() == true) ? 'true' : 'false')  . '<br/>';
+                echo 'Description: ' . $detail->getDescription() . '<br/>';
+                echo '<hr/>';
+            }
+        }
+
+        echo '<h2>ExplainOther data</h2>';
+        foreach ($debugResult->getExplainOther() as $key => $explanation) {
+            echo '<h3>Document key: ' . $key . '</h3>';
+            echo 'Value: ' . $explanation->getValue() . '<br/>';
+            echo 'Match: ' . (($explanation->getMatch() == true) ? 'true' : 'false')  . '<br/>';
+            echo 'Description: ' . $explanation->getDescription() . '<br/>';
+            echo '<h4>Details</h4>';
+            foreach ($explanation as $detail) {
+                echo 'Value: ' . $detail->getValue() . '<br/>';
+                echo 'Match: ' . (($detail->getMatch() == true) ? 'true' : 'false')  . '<br/>';
+                echo 'Description: ' . $detail->getDescription() . '<br/>';
+                echo '<hr/>';
+            }
+        }
+
+        echo '<h2>Timings (in ms)</h2>';
+        echo 'Total time: ' . $debugResult->getTiming()->getTime() . '<br/>';
+        echo '<h3>Phases</h3>';
+        foreach ($debugResult->getTiming()->getPhases() as $phaseName => $phaseData) {
+            echo '<h4>' . $phaseName . '</h4>';
+            foreach ($phaseData as $class => $time) {
+                echo $class . ': ' . $time . '<br/>';
+            }
+            echo '<hr/>';
+        }
+
+        die();
+    }
+
+    /**
      * Test to add a document on base solarium
      * @return \Illuminate\Http\Response
      */
