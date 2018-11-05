@@ -69,7 +69,7 @@ class SolariumController extends Controller
                     $fields[] = $object;
                 }
                 
-                return response()->json(Response::toString(true, "The elements were found!", ["Element" => $fields]), 200);
+                return response()->json(Response::toString(true, "The elements were found!", ["element" => $fields]), 200);
             }
             else 
             {
@@ -182,7 +182,7 @@ class SolariumController extends Controller
 
             $result = $this->client->update($update);
 
-            return response()->json(Response::toString(true, "Document created!", ["Result" => $doc]), 200);
+            return response()->json(Response::toString(true, "Document created!", ["result" => $doc]), 200);
         }
         catch (\Solarium\Exception $e)
         {
@@ -216,7 +216,7 @@ class SolariumController extends Controller
 
             $result = $this->client->update($update);
 
-            return response()->json(Response::toString(true, "Document created!", ["Result" => $doc]), 200);
+            return response()->json(Response::toString(true, "Document created!", ["result" => $doc]), 200);
         }
         catch (\Solarium\Exception $e)
         {
